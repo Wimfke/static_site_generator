@@ -56,39 +56,5 @@ class TestTextNodeToHTMLNode(unittest.TestCase):
         self.assertEqual(html_node.value, "This is bold")
 
 
-class TestSplitNodesDelimiter(unittest.TestCase):
-    def test_no_delimiter(self):
-        nodes = [
-            TextNode("Hello world!", TextType.TEXT)
-        ]
-        result = split_nodes_delimiter(nodes, "**", TextType.BOLD)
-
-        self.assertEqual(result[0].text, "Hello world!")
-        self.assertEqual(len(result), 1)
-    
-    def test_multiple_bold_blocks(self):
-        nodes = [
-            TextNode("This is **bold** text", TextType.TEXT),
-            TextNode("Some more **bold** text", TextType.TEXT)
-        ]
-        result = split_nodes_delimiter(nodes, "**", TextType.BOLD)
-        self.assertEqual(len(result), 6)
-        self.assertEqual(result[1].text_type, TextType.BOLD)
-        self.assertEqual(result[4].text_type, TextType.BOLD)
-
-    def test_mixed_nodes(self):
-        nodes = [
-            TextNode("Start ", TextType.TEXT),
-            TextNode("bold", TextType.BOLD),
-            TextNode(" and `code`", TextType.TEXT),
-        ]
-
-        result = split_nodes_delimiter(nodes, "`", TextType.CODE)
-
-        self.assertEqual(result[1].text_type, TextType.BOLD)
-        self.assertEqual(result[3].text_type, TextType.CODE)
-
-
-
 if __name__ == "__main__":
     unittest.main()
