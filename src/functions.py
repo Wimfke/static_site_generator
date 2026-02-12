@@ -89,16 +89,6 @@ def text_to_textnodes(text):
     nodes = split_nodes_link(nodes)
     return nodes
 
-def markdown_to_blocks(markdown):
-    lines = markdown.split("\n\n")
-    clean_lines = []
-    for line in lines:
-        stripped = line.strip()
-        if stripped:
-            clean_lines.append(stripped)
-    return clean_lines
-
-
 
 if __name__ == "__main__":
     nodes = [TextNode("This is **bold** text", TextType.TEXT)]
