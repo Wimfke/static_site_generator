@@ -2,7 +2,8 @@ import unittest
 from markdown_blocks import (
     markdown_to_blocks,
     block_to_block_type,
-    BlockType
+    BlockType,
+    markdown_to_html_node,
 )
 from textnode import TextNode, TextType
 
@@ -173,6 +174,57 @@ This is the same paragraph on a new line
             self.assertEqual(block_to_block_type(block), BlockType.OLIST)
             block = "paragraph"
             self.assertEqual(block_to_block_type(block), BlockType.PARAGRAPH)
+
+        def test_paragraph(self):
+            md = "Hello world"
+            node = markdown_to_html_node(md)
+            html = node.to_html()
+            self.assertIn("<p>Hello world</p>", html)
+
+        def test_heading(self):
+            md = "# Title"
+            node = markdown_to_html_node(md)
+            html = node.to_html()
+            self.assertIn("<h1>Title</h1>", html)
+
+        def test_quote(self):
+            md = "> Hello\n> World"
+            node = markdown_to_html_node(md)
+            html = node.to_html()
+            self.assertIn("<blockquote>Hello World</blockquote>", html)
+
+        def test_code_block(self):
+            md = "```\nprint('hi')\n```"
+            node = markdown_to_html_node(md)
+            html = node.to_html()
+            self.assertIn("<pre>", html)
+            self.assertIn("print('hi')", html)
+
+        def test_unordered_list(self):
+            md = "- One\n- Two\n- Three"
+            node = markdown_to_html_node(md)
+            html = node.to_html()
+            self.assertIn("<ul>", html)
+            self.assertIn("<li>One</li>", html)
+            self.assertIn("<li>Two</li>", html)
+            self.assertIn("<li>Three</li>", html)
+
+        def test_ordered_list(self):
+            md = "1. First\n2. Second\n3. Third"
+            node = markdown_to_html_node(md)
+            html = node.to_html()
+            self.assertIn("<ol>", html)
+            self.assertIn("<li>First</li>", html)
+            self.assertIn("<li>Second</li>", html)
+            self.assertIn("<li>Third</li>", html)
+
+        def test_multiple_blocks(self):
+            md = "# Title\n\nHello\n\n- A\n- B"
+            node = markdown_to_html_node(md)
+            html = node.to_html()
+            self.assertIn("<h1>Title</h1>", html)
+            self.assertIn("<p>Hello</p>", html)
+            self.assertIn("<ul>", html)
 
 
 
