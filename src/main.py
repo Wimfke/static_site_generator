@@ -1,21 +1,20 @@
-from textnode import TextNode, TextType
-from htmlnode import HTMLNode, LeafNode
+import os
+import shutil
+
+from copystatic import copy_static
+
+src = "static"
+dst = "public"
 
 
-dummy_node = TextNode(
-    "This is some anchor text",
-    TextType.LINK,
-    "https://www.boot.dev"
-)
+def main():
+    print("Deleting public directory...")
+    if os.path.exists(dst):
+        shutil.rmtree(dst)
 
-dummy_leaf = LeafNode(
-    "p",
-    "Dit is een paragraaf",
-    {"href": "https://www.google.com"}
-)
+    print("Copying static files to public directory...")
+    copy_static(src, dst)
 
-html_leaf = dummy_leaf.to_html()
 
-print(dummy_node)
-print(dummy_leaf)
-print(html_leaf)
+if __name__ == "__main__":
+    main()
