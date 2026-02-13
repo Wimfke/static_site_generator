@@ -1,7 +1,8 @@
 from enum import Enum
-from htmlnode import LeafNode, ParentNode
-from functions import text_to_textnodes
-from textnode import TextNode, TextType, text_node_to_html_node
+
+from htmlnode import ParentNode
+from inline_markdown import text_to_textnodes
+from textnode import text_node_to_html_node, TextNode, TextType
 
 
 class BlockType(Enum):
@@ -9,39 +10,48 @@ class BlockType(Enum):
     HEADING = "heading"
     CODE = "code"
     QUOTE = "quote"
-    ULIST = "unordered_list"
     OLIST = "ordered_list"
+    ULIST = "unordered_list"
 
 
 def markdown_to_blocks(markdown):
     blocks = markdown.split("\n\n")
-    clean_blocks = []
-    for block in blocks: 
-        stripped = block.strip()
-        if stripped:
-            clean_blocks.append(stripped) 
-    return clean_blocks
+    filtered_blocks = []
+    for block in blocks:
+        if block == "":
+            continue
+        block = block.strip()
+        filtered_blocks.append(block)
+    return filtered_blocks
+
 
 def block_to_block_type(block):
     lines = block.split("\n")
-    if block.startswith(tuple("#" * i + " " for i in range (1, 7))):
+
+    if block.startswith(("# ", "## ", "### ", "#### ", "##### ", "###### ")):
         return BlockType.HEADING
     if len(lines) > 1 and lines[0].startswith("```") and lines[-1].startswith("```"):
         return BlockType.CODE
-    if all(line.startswith(">") for line in lines):
+    if block.startswith(">"):
+        for line in lines:
+            if not line.startswith(">"):
+                return BlockType.PARAGRAPH
         return BlockType.QUOTE
-    if all(line.startswith("- ") for line in lines):
+    if block.startswith("- "):
+        for line in lines:
+            if not line.startswith("- "):
+                return BlockType.PARAGRAPH
         return BlockType.ULIST
-    ordered = True
-    for num, line in enumerate(lines, 1):
-        if not line.startswith(f"{num}. "):
-            ordered = False
-            break
-    if ordered:
+    if block.startswith("1. "):
+        i = 1
+        for line in lines:
+            if not line.startswith(f"{i}. "):
+                return BlockType.PARAGRAPH
+            i += 1
         return BlockType.OLIST
-    else:
-        return BlockType.PARAGRAPH
-    
+    return BlockType.PARAGRAPH
+
+
 def markdown_to_html_node(markdown):
     blocks = markdown_to_blocks(markdown)
     children = []
